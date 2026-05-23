@@ -8,20 +8,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user = trim($_POST['username']);
     $pass = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT id, username, password FROM account WHERE username = ?");
-    $stmt->bind_param("s", $user);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $query = "SELECT id, username, password FROM account WHERE username = '$user' AND password = '$pass'";
+    $result = mysqli_query($conn, $query);
 
     if ($row = $result->fetch_assoc()) {
-        if (password_verify($pass, $row['password'])) {
-            $_SESSION['user_id'] = $row['id'];
-            $_SESSION['username'] = $row['username'];
-            header("Location: home.php");
-            exit();
-        } else { $error = "Invalid password."; }
-    } else { $error = "User not found."; }
-    $stmt->close();
+        $_SESSION['user_id'] = $row['id'];
+        $_SESSION['username'] = $row['username'];
+        header("Location: home.php");
+        exit();
+    } else { 
+        $error = "User not found or incorrect password."; 
+    }
 }
 ?>
 <!DOCTYPE html>
